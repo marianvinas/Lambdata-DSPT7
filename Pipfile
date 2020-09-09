@@ -11,6 +11,8 @@ flake8 = "*"
 
 [packages]
 pandas = "*"
+sklearn = "*"
+ipython = "*"
 
 [requires]
 python_version = "3.7"
