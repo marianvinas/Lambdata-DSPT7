@@ -9,7 +9,7 @@ def enlarge(n):
     ''' 
     This function will multiple the input by 100 
     '''
-    return n * 100
+    return n * 1000
 
 
 class MyDataSplitter():
@@ -17,10 +17,15 @@ class MyDataSplitter():
     This class implements a 3-way data split and outputs summary metrics. 
     '''
 
-    def __init__(self, df):
+    def __init__(self, df, features, target):
         self.df = df
+        self.features = features
+        self.target = target
+        self.X = df[features]
+        self.y = df[target]
 
-    def train_validation_test_split(self, features, target,
+
+    def train_validation_test_split(self,
                                     train_size=0.7, val_size=0.1,
                                     test_size=0.2, random_state=None,
                                     shuffle=True):
@@ -47,17 +52,17 @@ class MyDataSplitter():
 
         return X_train, X_val, X_test, y_train, y_val, y_test
 
-    def date_divider(self, date_col):
+    #def date_divider(self, date_col):
         '''
         Param df: dataframe object from the Pandas library, entire dataframe where the date_column is located is required
         Param date_col: String value of the name of the date_column to be looked up in the passed dataframe
         Return: modified dataframe with the new Year, Month, and Day columns attached to the end.
         '''
-        converted_df = self.df.copy()
-        converted_df["Year"] = pd.DatetimeIndex(converted_df[date_col]).year
-        converted_df["Month"] = pd.DatetimeIndex(converted_df[date_col]).month
-        converted_df["Day"] = pd.DatetimeIndex(converted_df[date_col]).day
-        return converted_df
+        #converted_df = self.df.copy()
+        #converted_df["Year"] = pd.DatetimeIndex(converted_df[date_col]).year
+        #converted_df["Month"] = pd.DatetimeIndex(converted_df[date_col]).month
+        #converted_df["Day"] = pd.DatetimeIndex(converted_df[date_col]).day
+        #return converted_df
 
     def print_split_summary(self, X_train, X_val, X_test):
         '''
