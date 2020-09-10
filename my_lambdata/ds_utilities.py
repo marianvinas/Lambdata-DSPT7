@@ -43,8 +43,12 @@ class MyDataSplitter():
         Returns:
             Train, test, and validation dataframes for features (X) and target (y). 
         '''
+
+        X = self.df[features]
+        y = self.df[target]
+
         X_train_val, X_test, y_train_val, y_test = train_test_split(
-            self.X, self.y, test_size=test_size, random_state=random_state, shuffle=shuffle)
+            X, y, test_size=test_size, random_state=random_state, shuffle=shuffle)
 
         X_train, X_val, y_train, y_val = train_test_split(
             X_train_val, y_train_val, test_size=val_size / (train_size + val_size),
