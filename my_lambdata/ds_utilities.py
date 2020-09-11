@@ -1,8 +1,64 @@
+# Import libraries needed
 import pandas as pd
 from sklearn.model_selection import train_test_split
 from sklearn.datasets import load_wine
 from pdb import set_trace as breakpoint
 from IPython.display import display
+import requests
+from bs4 import BeautifulSoup
+
+
+def get_business_info(business, city, state):
+    '''
+    This function  will scrape the yellowpages website and
+    will return a list of the information, such as name, phone number,
+    street address, city, state, and zip code for those businesses.
+    Parameters:
+    -----------
+      business : type or name of business
+      city : name of the city where the business is located
+      state : the 2 character abbrivation for the state in which the
+        business is located.
+    Returns:
+    --------
+      DataFrame with information scraped from the yellowpages website,
+        based on the parameters entered into the function.
+    '''
+    
+    # Set the url to pull the data from:
+    url = f'https://www.yellowpages.com/search?search_terms={business}&geo_location_terms={city}%2C+{state}&s=distance'
+    # Create a get request:
+    response = requests.get(url)
+    # Check the status code to verify it is 200. This lets you know if there is
+    #  an error reaching the website based on the code:
+    if response.status_code == 200:
+        # Use beautiful soup to parse everything:
+        soup = BeautifulSoup(response.content, 'html.parser')
+        # Get the data from the location within the webpage:
+        information = soup.find_all('div', class_="info")
+        data = {'Name': [], 'Phone_No': [], 'Street': [], 'City_State_Zip': []}
+        for info in information:
+            # Get all the attribrutes we need:
+            name = info.find('a', class_="business-name").span
+            name = name.text if name else None
+            phone = info.find('div', class_='phones phone primary')
+            phone = phone.text if phone else None
+            street = info.find('div', class_='street-address')
+            street = street.text if street else None
+            area = info.find('div', class_='locality')
+            area = area.text if area else None
+            # Store the values in a data object:
+            data['Name'].append(name)
+            data['Phone_No'].append(phone)
+            data['Street'].append(street)
+            data['City_State_Zip'].append(area)
+    else:
+        print('There is an error, the website can not be reached.')
+        
+    # Turn data collected into a pandas dataframe:
+    business_info = pd.DataFrame(data, columns=['Name', 'Phone_No', 'Street',
+                                                'City_State_Zip'])
+    return business_info
 
 
 def enlarge(n):
@@ -38,8 +94,12 @@ class MyDataSplitter():
         Returns:
             Train, test, and validation dataframes for features (X) and target (y). 
         '''
+
+        X = self.df[features]
+        y = self.df[target]
+
         X_train_val, X_test, y_train_val, y_test = train_test_split(
-            self.X, self.y, test_size=test_size, random_state=random_state, shuffle=shuffle)
+            X, y, test_size=test_size, random_state=random_state, shuffle=shuffle)
 
         X_train, X_val, y_train, y_val = train_test_split(
             X_train_val, y_train_val, test_size=val_size / (train_size + val_size),
